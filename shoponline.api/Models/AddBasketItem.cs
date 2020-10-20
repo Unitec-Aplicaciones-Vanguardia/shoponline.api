@@ -5,10 +5,9 @@ using System.Threading.Tasks;
 
 namespace shoponline.api.Models
 {
-    public class Brand
+    public class AddBasketItem
     {
-        public string Name { get; set; }
-
-        public IEnumerable<Product> Products { get; set; }
+        public int ProductId { get; set; }
+        public int Quantity { get; set; }
     }
 }

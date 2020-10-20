@@ -7,7 +7,11 @@ namespace shoponline.api.Models
 {
     public class Product
     {
+        public int CategoryId { get; set; }
+
         public Category Category { get; set; }
+
+        public string BrandName { get; set; }
 
         public Brand Brand { get; set; }
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using shoponline.api.Models;
 
 namespace shoponline.api.Controllers
@@ -12,90 +13,44 @@ namespace shoponline.api.Controllers
     [Route("api/[controller]")]
     public class ProductsController : ControllerBase
     {
-        private static readonly Product[] Products = new[]
-        {
-            new Product
-            {
-                Brand = new Brand
-                {
-                    Name = "Sony"
-                },
-                Name = "Play Station 5",
-                Id = 1,
-                Category = new Category
-                {
-                    Id = 1,
-                    Description = "Consoles"
-                },
-                Price = 399,
-                Stock = 1
-            },
-            new Product
-            {
-                Brand = new Brand
-                {
-                    Name = "Microsoft"
-                },
-                Name = "Xbox",
-                Id = 2,
-                Category = new Category
-                {
-                    Id = 1,
-                    Description = "Consoles"
-                },
-                Price = 499,
-                Stock = 2
-            },
-            new Product
-            {
-                Brand = new Brand
-                {
-                    Name = "Apple"
-                },
-                Name = "iPhone 12",
-                Id = 3,
-                Category = new Category
-                {
-                    Id = 2,
-                    Description = "Cellphones"
-                },
-                Price = 1200,
-                Stock = 5
-            }
-        };
+        private readonly Product[] _products;
 
+        public ProductsController()
+        {
+            var products = System.IO.File.ReadAllText("Data/products.json");
+            _products = JsonConvert.DeserializeObject<Product[]>(products);
+        }
         //get, post, put, delete
 
         [HttpGet]
-        public IEnumerable<Product> Get()
+        public IEnumerable<Product> Get([FromQuery] string name)
         {
-            return Products;
+            if (string.IsNullOrEmpty(name))
+            {
+                return _products;
+            }
+
+            var products = new List<Product>();
+            for (int i = 0; i < _products.Length; i++)
+            {
+                if (_products[i].Name.ToLower().Contains(name.ToLower()))
+                {
+                    products.Add(_products[i]);
+                }
+            }
+
+            return products;
         }
 
         [HttpGet]
         [Route("{productId}")]
         public Product Get(int productId)
         {
-            for (int i = 0; i < Products.Length; i++)
+            for (int i = 0; i < _products.Length; i++)
             {
-                if (Products[i].Id == productId)
+                if (_products[i].Id == productId)
                 {
-                    return Products[i];
-                }
-            }
-
-            return null;
-        }
-
-        [HttpGet]
-        [Route("filter/{name}")]
-        public Product Get(string name)
-        {
-            for (int i = 0; i < Products.Length; i++)
-            {
-                if (Products[i].Name == name)
-                {
-                    return Products[i];
+                    return _products[i];
                 }
             }
 
