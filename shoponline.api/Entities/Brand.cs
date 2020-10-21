@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using shoponline.api.Models;
 
-namespace shoponline.api.Models
+namespace shoponline.api.Entities
 {
     public class Brand
     {

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using shoponline.api.Entities;
 using shoponline.api.Models;
 
 namespace shoponline.api.Controllers

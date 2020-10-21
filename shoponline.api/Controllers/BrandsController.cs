@@ -4,7 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Newtonsoft.Json;
+using shoponline.api.Data;
+using shoponline.api.Entities;
 using shoponline.api.Models;
 
 namespace shoponline.api.Controllers
@@ -13,11 +16,13 @@ namespace shoponline.api.Controllers
     [ApiController]
     public class BrandsController : ControllerBase
     {
+        private readonly ShopOnlineDbContext _shopOnlineDbContext;
         private readonly Brand[] _brands;
         private readonly Product[] _products;
 
-        public BrandsController()
+        public BrandsController(ShopOnlineDbContext shopOnlineDbContext)
         {
+            _shopOnlineDbContext = shopOnlineDbContext;
             var brands = System.IO.File.ReadAllText("Data/brands.json");
             _brands = JsonConvert.DeserializeObject<Brand[]>(brands);
 
@@ -28,7 +33,7 @@ namespace shoponline.api.Controllers
         [HttpGet]
         public IEnumerable<Brand> Get()
         {
-            return _brands;
+            return _shopOnlineDbContext.Brands;
         }
 
         [HttpGet]

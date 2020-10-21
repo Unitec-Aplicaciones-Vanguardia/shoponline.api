@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace shoponline.api.Models
+﻿namespace shoponline.api.Entities
 {
     public class Product
     {
@@ -15,7 +10,7 @@ namespace shoponline.api.Models
 
         public Brand Brand { get; set; }
 
-        public decimal Price { get; set; }
+        public double Price { get; set; }
 
         public string Name { get; set; }
 

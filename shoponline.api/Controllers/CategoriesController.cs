@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using shoponline.api.Entities;
 using shoponline.api.Models;
 
 namespace shoponline.api.Controllers
