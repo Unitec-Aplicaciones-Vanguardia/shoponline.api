@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using shoponline.api.Entities;
 using shoponline.api.Models;
+using shoponline.Core.Entities;
+using shoponline.Infrastructure;
 
 namespace shoponline.api.Controllers
 {
@@ -15,82 +16,64 @@ namespace shoponline.api.Controllers
     public class BasketsController : ControllerBase
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private static readonly List<Basket> Baskets = new List<Basket>();
-        private readonly Product[] _products;
+        private readonly ShopOnlineDbContext _shopOnlineDbContext;
 
-        public BasketsController(IHttpContextAccessor httpContextAccessor)
+        public BasketsController(IHttpContextAccessor httpContextAccessor, ShopOnlineDbContext shopOnlineDbContext)
         {
             _httpContextAccessor = httpContextAccessor;
-            var products = System.IO.File.ReadAllText("Data/products.json");
-            _products = JsonConvert.DeserializeObject<Product[]>(products);
+            _shopOnlineDbContext = shopOnlineDbContext;
         }
 
         [HttpGet]
         public Basket Get()
         {
-            var buyerId = _httpContextAccessor.HttpContext.Request.Headers["#BuyerId"];
-
-            for (int i = 0; i < Baskets.Count; i++)
-            {
-                if (Baskets[i].BuyerId == buyerId)
-                {
-                    return Baskets[i];
-                }
-            }
-
-            return null;
+            var buyerId = _httpContextAccessor.HttpContext.Request.Headers["#BuyerId"].ToString();
+            return _shopOnlineDbContext.Baskets.FirstOrDefault(b => b.BuyerId == buyerId && !b.IsDeleted);
         }
 
         [HttpPost]
         public Basket Post([FromBody] AddBasketItem basketItem)
         {
-            var buyerId = _httpContextAccessor.HttpContext.Request.Headers["#BuyerId"];
+            var buyerId = _httpContextAccessor.HttpContext.Request.Headers["#BuyerId"].ToString();
 
-            var product = FindProduct(basketItem.ProductId);
-
-            foreach (var basket in Baskets)
+            var product = _shopOnlineDbContext.Products.FirstOrDefault(p => p.Id == basketItem.ProductId);
+            if (product == null)
             {
-                if (basket.BuyerId == buyerId)
-                {
-                    var items = basket.Items.ToList();
-                    items.Add(new BasketItem
-                    {
-                        Price = product.Price,
-                        Quantity = basketItem.Quantity,
-                        Name = product.Name
-                    });
-                    basket.Items = items;
-                    basket.Total += product.Price * basketItem.Quantity;
-                    return basket;
-                }
+                return null;
             }
 
-            Baskets.Add(new Basket
+            var basket = _shopOnlineDbContext.Baskets.FirstOrDefault(b => b.BuyerId == buyerId && !b.IsDeleted);
+
+            if (basket != null)
             {
-                BuyerId = buyerId,
-                Items = new List<BasketItem>{ new BasketItem
+                basket.Items.Add(new BasketItem
                 {
                     Price = product.Price,
                     Quantity = basketItem.Quantity,
                     Name = product.Name
-                } },
-                Total = basketItem.Quantity * product.Price
-            });
-
-            return Baskets.Last();
-        }
-
-        private Product FindProduct(int productId)
-        {
-            foreach (var product in _products)
-            {
-                if (product.Id == productId)
-                {
-                    return product;
-                }
+                });
+                basket.Total += product.Price * basketItem.Quantity;
+                _shopOnlineDbContext.SaveChanges();
+                return basket;
             }
 
-            return null;
+            var newBasket = new Basket
+            {
+                BuyerId = buyerId,
+                Items = new List<BasketItem>
+                {
+                    new BasketItem
+                    {
+                        Price = product.Price,
+                        Quantity = basketItem.Quantity,
+                        Name = product.Name
+                    }
+                },
+                Total = basketItem.Quantity * product.Price
+            };
+            _shopOnlineDbContext.Baskets.Add(newBasket);
+            _shopOnlineDbContext.SaveChanges();
+            return newBasket;
         }
     }
 }

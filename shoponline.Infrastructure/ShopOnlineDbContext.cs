@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Principal;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using shoponline.api.Entities;
-using shoponline.api.Entities.Configurations;
-using shoponline.api.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using shoponline.Core.Entities;
+using shoponline.Infrastructure.Configurations;
 
-namespace shoponline.api.Data
+namespace shoponline.Infrastructure
 {
     public class ShopOnlineDbContext : DbContext
     {

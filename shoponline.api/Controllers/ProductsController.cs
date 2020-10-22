@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using shoponline.api.Entities;
 using shoponline.api.Models;
+using shoponline.Core.Entities;
+using shoponline.Infrastructure;
 
 namespace shoponline.api.Controllers
 {
@@ -14,12 +15,11 @@ namespace shoponline.api.Controllers
     [Route("api/[controller]")]
     public class ProductsController : ControllerBase
     {
-        private readonly Product[] _products;
+        private readonly ShopOnlineDbContext _shopOnlineDbContext;
 
-        public ProductsController()
+        public ProductsController(ShopOnlineDbContext shopOnlineDbContext)
         {
-            var products = System.IO.File.ReadAllText("Data/products.json");
-            _products = JsonConvert.DeserializeObject<Product[]>(products);
+            _shopOnlineDbContext = shopOnlineDbContext;
         }
         //get, post, put, delete
 
@@ -28,34 +28,17 @@ namespace shoponline.api.Controllers
         {
             if (string.IsNullOrEmpty(name))
             {
-                return _products;
+                return _shopOnlineDbContext.Products;
             }
 
-            var products = new List<Product>();
-            for (int i = 0; i < _products.Length; i++)
-            {
-                if (_products[i].Name.ToLower().Contains(name.ToLower()))
-                {
-                    products.Add(_products[i]);
-                }
-            }
-
-            return products;
+            return _shopOnlineDbContext.Products.Where(p => p.Name.Contains(name));
         }
 
         [HttpGet]
         [Route("{productId}")]
         public Product Get(int productId)
         {
-            for (int i = 0; i < _products.Length; i++)
-            {
-                if (_products[i].Id == productId)
-                {
-                    return _products[i];
-                }
-            }
-
-            return null;
+            return _shopOnlineDbContext.Products.FirstOrDefault(p => p.Id == productId);
         }
     }
 }

@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using shoponline.Core.Entities;
 
-namespace shoponline.api.Entities.Configurations
+namespace shoponline.Infrastructure.Configurations
 {
     public class BasketConfiguration : IEntityTypeConfiguration<Basket>
     {

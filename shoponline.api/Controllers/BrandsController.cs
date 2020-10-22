@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Newtonsoft.Json;
-using shoponline.api.Data;
-using shoponline.api.Entities;
 using shoponline.api.Models;
+using shoponline.Core.Entities;
+using shoponline.Infrastructure;
 
 namespace shoponline.api.Controllers
 {
@@ -17,17 +17,10 @@ namespace shoponline.api.Controllers
     public class BrandsController : ControllerBase
     {
         private readonly ShopOnlineDbContext _shopOnlineDbContext;
-        private readonly Brand[] _brands;
-        private readonly Product[] _products;
 
         public BrandsController(ShopOnlineDbContext shopOnlineDbContext)
         {
             _shopOnlineDbContext = shopOnlineDbContext;
-            var brands = System.IO.File.ReadAllText("Data/brands.json");
-            _brands = JsonConvert.DeserializeObject<Brand[]>(brands);
-
-            var products = System.IO.File.ReadAllText("Data/products.json");
-            _products = JsonConvert.DeserializeObject<Product[]>(products);
         }
 
         [HttpGet]
@@ -38,18 +31,9 @@ namespace shoponline.api.Controllers
 
         [HttpGet]
         [Route("{name}/products")]
-        //brands/polo/products
         public IEnumerable<Product> Get(string name)
         {
-            var products = new List<Product>();
-            for (int i = 0; i < _products.Length; i++)
-            {
-                if (string.Equals(_products[i].BrandName, name, StringComparison.CurrentCultureIgnoreCase))
-                {
-                    products.Add(_products[i]);
-                }
-            }
-
+            var products = _shopOnlineDbContext.Products.Where(p => p.BrandName == name);
             return products;
         }
     }

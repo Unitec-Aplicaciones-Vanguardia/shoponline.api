@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using shoponline.api.Entities;
 using shoponline.api.Models;
+using shoponline.Core.Entities;
+using shoponline.Infrastructure;
 
 namespace shoponline.api.Controllers
 {
@@ -14,37 +15,23 @@ namespace shoponline.api.Controllers
     [ApiController]
     public class CategoriesController : ControllerBase
     {
-        private readonly Category[] _categories;
-        private readonly Product[] _products;
-
-        public CategoriesController()
+        private readonly ShopOnlineDbContext _shopOnlineDbContext;
+        public CategoriesController(ShopOnlineDbContext shopOnlineDbContext)
         {
-            var categories = System.IO.File.ReadAllText("Data/categories.json");
-            _categories = JsonConvert.DeserializeObject<Category[]>(categories);
-
-            var products = System.IO.File.ReadAllText("Data/products.json");
-            _products = JsonConvert.DeserializeObject<Product[]>(products);
+            _shopOnlineDbContext = shopOnlineDbContext;
         }
 
         [HttpGet]
         public IEnumerable<Category> Get()
         {
-            return _categories;
+            return _shopOnlineDbContext.Categories;
         }
 
         [HttpGet]
         [Route("{categoryId}/products")]
         public IEnumerable<Product> Get(int categoryId)
         {
-            var products = new List<Product>();
-            for (int i = 0; i < _products.Length; i++)
-            {
-                if (_products[i].CategoryId == categoryId)
-                {
-                    products.Add(_products[i]);
-                }
-            }
-
+            var products = _shopOnlineDbContext.Products.Where(p => p.CategoryId == categoryId);
             return products;
         }
     }

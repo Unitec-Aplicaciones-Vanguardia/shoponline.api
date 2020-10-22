@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace shoponline.api.Migrations
+namespace shoponline.Infrastructure.Migrations
 {
     public partial class InitialMigration : Migration
     {
