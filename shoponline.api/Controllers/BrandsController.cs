@@ -24,17 +24,28 @@ namespace shoponline.api.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<Brand> Get()
+        public ActionResult<IEnumerable<BrandDto>> Get()
         {
-            return _shopOnlineDbContext.Brands;
+            return Ok(_shopOnlineDbContext.Brands.Select(b => new BrandDto
+            {
+                Name = b.Name
+            }));
         }
 
         [HttpGet]
         [Route("{name}/products")]
-        public IEnumerable<Product> Get(string name)
+        public ActionResult<IEnumerable<ProductDto>> Get(string name)
         {
             var products = _shopOnlineDbContext.Products.Where(p => p.BrandName == name);
-            return products;
+            return Ok(products.Select(p => new ProductDto
+            {
+                Id = p.Id,
+                BrandName = p.BrandName,
+                Name = p.Name,
+                Stock = p.Stock,
+                CategoryName = p.Category.Description,
+                Price = p.Price
+            }));
         }
     }
 }

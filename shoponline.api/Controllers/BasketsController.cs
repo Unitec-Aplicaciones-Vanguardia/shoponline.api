@@ -25,10 +25,28 @@ namespace shoponline.api.Controllers
         }
 
         [HttpGet]
-        public Basket Get()
+        public ActionResult<BasketDto> Get()
         {
             var buyerId = _httpContextAccessor.HttpContext.Request.Headers["#BuyerId"].ToString();
-            return _shopOnlineDbContext.Baskets.FirstOrDefault(b => b.BuyerId == buyerId && !b.IsDeleted);
+            var basket = _shopOnlineDbContext.Baskets.FirstOrDefault(b => b.BuyerId == buyerId && !b.IsDeleted);
+            if (basket == null)
+            {
+                return NotFound("El basket no existe");
+            }
+
+            return Ok(new BasketDto
+            {
+                Id = basket.Id,
+                BuyerId = basket.BuyerId,
+                Total = basket.Total,
+                Items = basket.Items.Select(i => new BasketItemDto
+                {
+                    Price = i.Price,
+                    Quantity = i.Quantity,
+                    Id = i.Id,
+                    Name = i.Name
+                })
+            });
         }
 
         [HttpPost]
