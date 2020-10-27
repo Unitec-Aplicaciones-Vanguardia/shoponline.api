@@ -2,14 +2,12 @@
 
 namespace shoponline.Core.Entities
 {
-    public class Category
+    public class Category : BaseEntity
     {
         public Category()
         {
             Products = new List<Product>();
         }
-
-        public int Id { get; set; }
 
         public string Description { get; set; }
 

@@ -7,6 +7,8 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using shoponline.api.Models;
 using shoponline.Core.Entities;
+using shoponline.Core.Enums;
+using shoponline.Core.Interfaces;
 using shoponline.Infrastructure;
 
 namespace shoponline.api.Controllers
@@ -15,30 +17,51 @@ namespace shoponline.api.Controllers
     [Route("api/[controller]")]
     public class ProductsController : ControllerBase
     {
-        private readonly ShopOnlineDbContext _shopOnlineDbContext;
+        private readonly IProductService _productService;
 
-        public ProductsController(ShopOnlineDbContext shopOnlineDbContext)
+        public ProductsController(IProductService productService)
         {
-            _shopOnlineDbContext = shopOnlineDbContext;
+            _productService = productService;
         }
-        //get, post, put, delete
 
         [HttpGet]
-        public IEnumerable<Product> Get([FromQuery] string name)
+        public ActionResult<ProductDto> Get([FromQuery] string name)
         {
-            if (string.IsNullOrEmpty(name))
-            {
-                return _shopOnlineDbContext.Products;
-            }
+            var serviceResult = _productService.FilterByName(name);
+            if (serviceResult.ResponseCode != ResponseCode.Success)
+                return BadRequest(serviceResult.Error);
 
-            return _shopOnlineDbContext.Products.Where(p => p.Name.Contains(name));
+            var products = serviceResult.Result;
+            return Ok(products.Select(p => new ProductDto
+            {
+                Id = p.Id,
+                BrandName = p.BrandName,
+                Name = p.Name,
+                Stock = p.Stock,
+                CategoryName = p.Category.Description,
+                Price = p.Price
+            }));
         }
 
         [HttpGet]
         [Route("{productId}")]
-        public Product Get(int productId)
+        public ActionResult<Product> Get(int productId)
         {
-            return _shopOnlineDbContext.Products.FirstOrDefault(p => p.Id == productId);
+            var serviceResult = _productService.GetById(productId);
+            if (serviceResult.ResponseCode != ResponseCode.Success)
+                return BadRequest(serviceResult.Error);
+
+            var product = serviceResult.Result;
+
+            return Ok(new ProductDto
+            {
+                Id = product.Id,
+                BrandName = product.BrandName,
+                Name = product.Name,
+                Stock = product.Stock,
+                CategoryName = product.Category.Description,
+                Price = product.Price
+            });
         }
     }
 }

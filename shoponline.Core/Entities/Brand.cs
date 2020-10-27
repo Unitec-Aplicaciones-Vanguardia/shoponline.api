@@ -2,7 +2,7 @@
 
 namespace shoponline.Core.Entities
 {
-    public class Brand
+    public class Brand : BaseEntity
     {
         public Brand()
         {

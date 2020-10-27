@@ -1,6 +1,6 @@
 ﻿namespace shoponline.Core.Entities
 {
-    public class Product
+    public class Product : BaseEntity
     {
         public int CategoryId { get; set; }
 
@@ -15,7 +15,5 @@
         public string Name { get; set; }
 
         public int Stock { get; set; }
-
-        public int Id { get; set; }
     }
 }

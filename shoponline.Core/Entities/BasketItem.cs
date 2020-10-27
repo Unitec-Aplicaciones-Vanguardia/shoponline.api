@@ -1,9 +1,7 @@
 ﻿namespace shoponline.Core.Entities
 {
-    public class BasketItem
+    public class BasketItem : BaseEntity
     {
-        public int Id { get; set; }
-
         public string Name { get; set; }
 
         public double Price { get; set; }

@@ -2,7 +2,7 @@
 
 namespace shoponline.Core.Entities
 {
-    public class Basket
+    public class Basket : BaseEntity
     {
         public Basket()
         {
@@ -13,8 +13,6 @@ namespace shoponline.Core.Entities
         public double Total { get; set; }
 
         public string BuyerId { get; set; }
-
-        public int Id { get; set; }
 
         public bool IsDeleted { get; set; }
     }

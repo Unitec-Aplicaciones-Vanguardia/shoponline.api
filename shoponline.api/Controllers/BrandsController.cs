@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc.Routing;
 using Newtonsoft.Json;
 using shoponline.api.Models;
 using shoponline.Core.Entities;
+using shoponline.Core.Enums;
+using shoponline.Core.Interfaces;
 using shoponline.Infrastructure;
 
 namespace shoponline.api.Controllers
@@ -16,17 +18,21 @@ namespace shoponline.api.Controllers
     [ApiController]
     public class BrandsController : ControllerBase
     {
-        private readonly ShopOnlineDbContext _shopOnlineDbContext;
+        private readonly IBrandService _brandService;
 
-        public BrandsController(ShopOnlineDbContext shopOnlineDbContext)
+        public BrandsController(IBrandService brandService)
         {
-            _shopOnlineDbContext = shopOnlineDbContext;
+            _brandService = brandService;
         }
 
         [HttpGet]
         public ActionResult<IEnumerable<BrandDto>> Get()
         {
-            return Ok(_shopOnlineDbContext.Brands.Select(b => new BrandDto
+            var serviceResult = _brandService.GetBrands();
+            if (serviceResult.ResponseCode != ResponseCode.Success)
+                return BadRequest(serviceResult.Error);
+
+            return Ok(serviceResult.Result.Select(b => new BrandDto
             {
                 Name = b.Name
             }));
@@ -36,7 +42,11 @@ namespace shoponline.api.Controllers
         [Route("{name}/products")]
         public ActionResult<IEnumerable<ProductDto>> Get(string name)
         {
-            var products = _shopOnlineDbContext.Products.Where(p => p.BrandName == name);
+            var serviceResult = _brandService.GetProductsByBrand(name);
+            if (serviceResult.ResponseCode != ResponseCode.Success)
+                return BadRequest(serviceResult.Error);
+
+            var products = serviceResult.Result;
             return Ok(products.Select(p => new ProductDto
             {
                 Id = p.Id,
