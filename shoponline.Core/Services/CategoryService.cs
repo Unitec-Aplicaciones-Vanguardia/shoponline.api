@@ -10,9 +10,9 @@ namespace shoponline.Core.Services
     public class CategoryService : ICategoryService
     {
         private readonly IRepository<Category> _categoryRepository;
-        private readonly IRepository<Product> _productRepository;
+        private readonly IProductRepository _productRepository;
 
-        public CategoryService(IRepository<Category> categoryRepository, IRepository<Product> productRepository)
+        public CategoryService(IRepository<Category> categoryRepository, IProductRepository productRepository)
         {
             _categoryRepository = categoryRepository;
             _productRepository = productRepository;
@@ -25,7 +25,7 @@ namespace shoponline.Core.Services
 
         public ServiceResult<IEnumerable<Product>> GetProductsByCategory(int categoryId)
         {
-            var products = _productRepository.Filter(p => p.CategoryId == categoryId);
+            var products = _productRepository.FilterIncludingDependencies(p => p.CategoryId == categoryId);
             return products.Any()
                 ? ServiceResult<IEnumerable<Product>>.SuccessResult(products)
                 : ServiceResult<IEnumerable<Product>>.NotFoundResult(

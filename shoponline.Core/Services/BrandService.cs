@@ -10,9 +10,9 @@ namespace shoponline.Core.Services
     public class BrandService : IBrandService
     {
         private readonly IRepository<Brand> _brandRepository;
-        private readonly IRepository<Product> _productRepository;
+        private readonly IProductRepository _productRepository;
 
-        public BrandService(IRepository<Brand> brandRepository, IRepository<Product> productRepository)
+        public BrandService(IRepository<Brand> brandRepository, IProductRepository productRepository)
         {
             _brandRepository = brandRepository;
             _productRepository = productRepository;
@@ -30,7 +30,7 @@ namespace shoponline.Core.Services
                 return ServiceResult<IEnumerable<Product>>.ErrorResult("El nombre de la marca no puede ser nulo");
             }
 
-            var result = _productRepository.Filter(b => b.BrandName == name);
+            var result = _productRepository.FilterIncludingDependencies( b => b.Brand.Name == name);
 
             return !result.Any()
                 ? ServiceResult<IEnumerable<Product>>.NotFoundResult(

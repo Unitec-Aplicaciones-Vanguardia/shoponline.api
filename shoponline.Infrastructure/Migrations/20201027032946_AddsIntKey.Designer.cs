@@ -8,8 +8,8 @@ using shoponline.Infrastructure;
 namespace shoponline.Infrastructure.Migrations
 {
     [DbContext(typeof(ShopOnlineDbContext))]
-    [Migration("20201027021525_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20201027032946_AddsIntKey")]
+    partial class AddsIntKey
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -66,10 +66,19 @@ namespace shoponline.Infrastructure.Migrations
 
             modelBuilder.Entity("shoponline.Core.Entities.Brand", b =>
                 {
-                    b.Property<string>("Name")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
 
-                    b.HasKey("Name");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasMaxLength(100);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Brands");
                 });
@@ -94,8 +103,8 @@ namespace shoponline.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("BrandName")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("BrandId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("CategoryId")
                         .HasColumnType("INTEGER");
@@ -112,7 +121,7 @@ namespace shoponline.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BrandName");
+                    b.HasIndex("BrandId");
 
                     b.HasIndex("CategoryId");
 
@@ -132,7 +141,9 @@ namespace shoponline.Infrastructure.Migrations
                 {
                     b.HasOne("shoponline.Core.Entities.Brand", "Brand")
                         .WithMany("Products")
-                        .HasForeignKey("BrandName");
+                        .HasForeignKey("BrandId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("shoponline.Core.Entities.Category", "Category")
                         .WithMany("Products")

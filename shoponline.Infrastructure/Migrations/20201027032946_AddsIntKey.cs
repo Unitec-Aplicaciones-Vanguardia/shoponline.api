@@ -2,7 +2,7 @@
 
 namespace shoponline.Infrastructure.Migrations
 {
-    public partial class InitialMigration : Migration
+    public partial class AddsIntKey : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -25,11 +25,13 @@ namespace shoponline.Infrastructure.Migrations
                 name: "Brands",
                 columns: table => new
                 {
-                    Name = table.Column<string>(nullable: false)
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Brands", x => x.Name);
+                    table.PrimaryKey("PK_Brands", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -74,7 +76,7 @@ namespace shoponline.Infrastructure.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     CategoryId = table.Column<int>(nullable: false),
-                    BrandName = table.Column<string>(nullable: true),
+                    BrandId = table.Column<int>(nullable: false),
                     Price = table.Column<double>(nullable: false),
                     Name = table.Column<string>(nullable: false),
                     Stock = table.Column<int>(nullable: false)
@@ -83,11 +85,11 @@ namespace shoponline.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_Products", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Products_Brands_BrandName",
-                        column: x => x.BrandName,
+                        name: "FK_Products_Brands_BrandId",
+                        column: x => x.BrandId,
                         principalTable: "Brands",
-                        principalColumn: "Name",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Products_Categories_CategoryId",
                         column: x => x.CategoryId,
@@ -102,9 +104,15 @@ namespace shoponline.Infrastructure.Migrations
                 column: "BasketId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Products_BrandName",
+                name: "IX_Brands_Name",
+                table: "Brands",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_BrandId",
                 table: "Products",
-                column: "BrandName");
+                column: "BrandId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Products_CategoryId",

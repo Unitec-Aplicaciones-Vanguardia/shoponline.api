@@ -13,7 +13,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using shoponline.api.Middlewares;
+using shoponline.Core.Interfaces;
+using shoponline.Core.Services;
 using shoponline.Infrastructure;
+using shoponline.Infrastructure.Repositories;
 
 namespace shoponline.api
 {
@@ -33,6 +36,9 @@ namespace shoponline.api
                 x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Serialize);
             services.AddHttpContextAccessor();
             services.AddDbContext<ShopOnlineDbContext>((s, o) => o.UseSqlite("Data Source=data.db"));
+            services.AddScoped(typeof(IRepository<>), typeof(EntityFrameworkRepository<>));
+            services.AddScoped<IBrandService, BrandService>();
+            services.AddScoped<IProductRepository, ProductRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

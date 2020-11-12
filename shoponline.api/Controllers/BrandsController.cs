@@ -50,7 +50,7 @@ namespace shoponline.api.Controllers
             return Ok(products.Select(p => new ProductDto
             {
                 Id = p.Id,
-                BrandName = p.BrandName,
+                BrandName = p.Brand.Name,
                 Name = p.Name,
                 Stock = p.Stock,
                 CategoryName = p.Category.Description,

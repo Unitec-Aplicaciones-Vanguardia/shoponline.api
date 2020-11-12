@@ -12,5 +12,9 @@ namespace shoponline.Core.Interfaces
         IEnumerable<T> Filter(Expression<Func<T, bool>> predicate);
 
         T GetById(int id);
+
+        T Add(T entity);
+
+        void Update(T entity);
     }
 }

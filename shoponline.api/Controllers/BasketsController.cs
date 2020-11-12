@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using shoponline.api.Models;
 using shoponline.Core.Entities;
+using shoponline.Core.Enums;
+using shoponline.Core.Interfaces;
 using shoponline.Infrastructure;
 
 namespace shoponline.api.Controllers
@@ -16,23 +18,23 @@ namespace shoponline.api.Controllers
     public class BasketsController : ControllerBase
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly ShopOnlineDbContext _shopOnlineDbContext;
+        private readonly IBasketService _basketService;
 
-        public BasketsController(IHttpContextAccessor httpContextAccessor, ShopOnlineDbContext shopOnlineDbContext)
+        public BasketsController(IHttpContextAccessor httpContextAccessor, IBasketService basketService)
         {
             _httpContextAccessor = httpContextAccessor;
-            _shopOnlineDbContext = shopOnlineDbContext;
+            _basketService = basketService;
         }
 
         [HttpGet]
         public ActionResult<BasketDto> Get()
         {
             var buyerId = _httpContextAccessor.HttpContext.Request.Headers["#BuyerId"].ToString();
-            var basket = _shopOnlineDbContext.Baskets.FirstOrDefault(b => b.BuyerId == buyerId && !b.IsDeleted);
-            if (basket == null)
-            {
-                return NotFound("El basket no existe");
-            }
+            var serviceResult = _basketService.FindBasketByUserId(buyerId);
+            if (serviceResult.ResponseCode == ResponseCode.NotFound)
+                return NotFound(serviceResult.Error);
+
+            var basket = serviceResult.Result;
 
             return Ok(new BasketDto
             {

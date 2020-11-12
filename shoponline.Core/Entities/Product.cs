@@ -6,7 +6,7 @@
 
         public Category Category { get; set; }
 
-        public string BrandName { get; set; }
+        public int BrandId { get; set; }
 
         public Brand Brand { get; set; }
 

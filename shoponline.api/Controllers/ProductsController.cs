@@ -35,7 +35,7 @@ namespace shoponline.api.Controllers
             return Ok(products.Select(p => new ProductDto
             {
                 Id = p.Id,
-                BrandName = p.BrandName,
+                BrandName = p.Brand.Name,
                 Name = p.Name,
                 Stock = p.Stock,
                 CategoryName = p.Category.Description,
@@ -56,7 +56,7 @@ namespace shoponline.api.Controllers
             return Ok(new ProductDto
             {
                 Id = product.Id,
-                BrandName = product.BrandName,
+                BrandName = product.Brand.Name,
                 Name = product.Name,
                 Stock = product.Stock,
                 CategoryName = product.Category.Description,
