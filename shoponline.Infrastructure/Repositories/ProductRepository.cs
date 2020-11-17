@@ -16,6 +16,17 @@ namespace shoponline.Infrastructure.Repositories
         {
         }
 
+        public IEnumerable<Product> GetAllIncludingDependencies()
+        {
+            return _shopOnlineDbContext.Products.Include(x => x.Category).Include(x => x.Brand).ToList();
+        }
+
+        public Product GetByIdIncludingDependencies(int id)
+        {
+            return _shopOnlineDbContext.Products.Include(x => x.Category).Include(x => x.Brand)
+                .FirstOrDefault(x => x.Id == id);
+        }
+
         public IEnumerable<Product> FilterIncludingDependencies(Expression<Func<Product, bool>> predicate)
         {
             return _shopOnlineDbContext.Products

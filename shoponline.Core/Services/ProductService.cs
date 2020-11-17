@@ -9,9 +9,9 @@ namespace shoponline.Core.Services
 {
     public class ProductService : IProductService
     {
-        private readonly IRepository<Product> _productRepository;
+        private readonly IProductRepository _productRepository;
 
-        public ProductService(IRepository<Product> productRepository)
+        public ProductService(IProductRepository productRepository)
         {
             _productRepository = productRepository;
         }
@@ -20,10 +20,10 @@ namespace shoponline.Core.Services
         {
             if (string.IsNullOrEmpty(name))
             {
-                return ServiceResult<IEnumerable<Product>>.SuccessResult(_productRepository.GetAll());
+                return ServiceResult<IEnumerable<Product>>.SuccessResult(_productRepository.GetAllIncludingDependencies());
             }
 
-            var products = _productRepository.Filter(p => p.Name.Contains(name));
+            var products = _productRepository.FilterIncludingDependencies(p => p.Name.Contains(name));
             return products.Any()
                 ? ServiceResult<IEnumerable<Product>>.SuccessResult(products)
                 : ServiceResult<IEnumerable<Product>>.NotFoundResult(
@@ -32,7 +32,7 @@ namespace shoponline.Core.Services
 
         public ServiceResult<Product> GetById(int id)
         {
-            var product = _productRepository.GetById(id);
+            var product = _productRepository.GetByIdIncludingDependencies(id);
             return product != null
                 ? ServiceResult<Product>.SuccessResult(product)
                 : ServiceResult<Product>.NotFoundResult(
