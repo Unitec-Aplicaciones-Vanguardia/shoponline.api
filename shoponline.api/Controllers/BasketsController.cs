@@ -17,12 +17,12 @@ namespace shoponline.api.Controllers
     [ApiController]
     public class BasketsController : ControllerBase
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IBuyerService _buyerService;
         private readonly IBasketService _basketService;
 
-        public BasketsController(IHttpContextAccessor httpContextAccessor, IBasketService basketService)
+        public BasketsController(IBuyerService buyerService, IBasketService basketService)
         {
-            _httpContextAccessor = httpContextAccessor;
+            _buyerService = buyerService;
             _basketService = basketService;
         }
 
@@ -51,49 +51,26 @@ namespace shoponline.api.Controllers
         //    });
         //}
 
-        //[HttpPost]
-        //public Basket Post([FromBody] AddBasketItem basketItem)
-        //{
-        //    var buyerId = _httpContextAccessor.HttpContext.Request.Headers["#BuyerId"].ToString();
-
-        //    var product = _shopOnlineDbContext.Products.FirstOrDefault(p => p.Id == basketItem.ProductId);
-        //    if (product == null)
-        //    {
-        //        return null;
-        //    }
-
-        //    var basket = _shopOnlineDbContext.Baskets.FirstOrDefault(b => b.BuyerId == buyerId && !b.IsDeleted);
-
-        //    if (basket != null)
-        //    {
-        //        basket.Items.Add(new BasketItem
-        //        {
-        //            Price = product.Price,
-        //            Quantity = basketItem.Quantity,
-        //            Name = product.Name
-        //        });
-        //        basket.Total += product.Price * basketItem.Quantity;
-        //        _shopOnlineDbContext.SaveChanges();
-        //        return basket;
-        //    }
-
-        //    var newBasket = new Basket
-        //    {
-        //        BuyerId = buyerId,
-        //        Items = new List<BasketItem>
-        //        {
-        //            new BasketItem
-        //            {
-        //                Price = product.Price,
-        //                Quantity = basketItem.Quantity,
-        //                Name = product.Name
-        //            }
-        //        },
-        //        Total = basketItem.Quantity * product.Price
-        //    };
-        //    _shopOnlineDbContext.Baskets.Add(newBasket);
-        //    _shopOnlineDbContext.SaveChanges();
-        //    return newBasket;
-        //}
+        [HttpPost]
+        public ActionResult<Basket> Post([FromBody] AddBasketItem basketItem)
+        {
+            var serviceResult = _basketService.AddBasketItem(basketItem.ProductId, basketItem.Quantity);
+            if (serviceResult.ResponseCode != ResponseCode.Success)
+                return BadRequest(serviceResult.Error);
+            var result = new BasketDto
+            {
+                Id = serviceResult.Result.Id,
+                BuyerId = serviceResult.Result.BuyerId,
+                Total = serviceResult.Result.Total,
+                Items = serviceResult.Result.Items.Select(x => new BasketItemDto
+                {
+                    Price = x.Price,
+                    Quantity = x.Quantity,
+                    Id = x.Id,
+                    Name = x.Name
+                })
+            };
+            return Ok(result);
+        }
     }
 }

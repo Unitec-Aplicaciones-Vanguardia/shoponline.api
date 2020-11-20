@@ -45,5 +45,10 @@ namespace shoponline.Infrastructure.Repositories
             _shopOnlineDbContext.Entry(entity).State = EntityState.Modified;
             _shopOnlineDbContext.SaveChanges();
         }
+
+        public int SaveChanges()
+        {
+            return _shopOnlineDbContext.SaveChanges();
+        }
     }
 }

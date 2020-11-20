@@ -16,5 +16,7 @@ namespace shoponline.Core.Interfaces
         T Add(T entity);
 
         void Update(T entity);
+
+        int SaveChanges();
     }
 }

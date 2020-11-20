@@ -8,5 +8,7 @@ namespace shoponline.Core.Interfaces
     public interface IBasketService
     {
         ServiceResult<Basket> FindBasketByUserId(string userId);
+
+        ServiceResult<Basket> AddBasketItem(int productId, int quantity);
     }
 }

@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using shoponline.api.Middlewares;
+using shoponline.api.Services;
 using shoponline.Core.Interfaces;
 using shoponline.Core.Services;
 using shoponline.Infrastructure;
@@ -45,6 +46,7 @@ namespace shoponline.api
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IBasketRepository, BasketRepository>();
+            services.AddScoped<IBuyerService, BuyerService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -73,7 +75,7 @@ namespace shoponline.api
 
         private bool IsVerifyRequestNeeded(HttpContext context)
         {
-            return context.Request.Path.StartsWithSegments("/api/baskets");
+            return context.Request.Path.StartsWithSegments("/api/baskets") && context.Request.Method == "POST";
         }
     }
 }
